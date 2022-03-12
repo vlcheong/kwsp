@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="KWSP(EPF) Dividend Calculator">
+        <meta name="robots" content="index, follow">
+        <title>KWSP</title>
+        <style>
+            body {
+                color: #4d565f;
+                font-family: "Helvetica neue", Helvetica, Arial, Sans-Serif;
+                margin: 0;
+                padding: 0;
+            }
+            *:focus {
+                outline: none !important;
+            }
+            label {
+                display: inline-block;
+                margin-bottom: 0.5rem;
+                padding-top: calc(0.25rem + 1px);
+                padding-bottom: calc(0.25rem + 1px);
+                font-size: 0.875rem;
+                min-width: 80px;
+                font-weight: 600;
+            }
+            input {
+                display: inline-block;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #212529;
+                background-color: #fff;
+                background-clip: padding-box;
+                border: 1px solid #ced4da;
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                padding: 0.2rem 0.5rem;
+                font-size: 0.875rem;
+                border-radius: 0.2rem;
+            }
+            button {
+                display: inline-block;
+                padding: 5px;
+                min-width: 50px;
+            }
+            .container {
+                padding-right: 0.75rem;
+                padding-left: 0.75rem;
+                margin-right: auto;
+                margin-left: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                border-spacing: 0;
+                display: table;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 5px;
+            }
+            thead>tr {
+                color: #fff !important;
+                background-color: #4caf50 !important;
+            }
+            tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+            table input {
+                box-sizing: border-box;
+                width: 100%;
+            }
+            .text-end {
+                text-align: right !important;
+            }
+            footer {
+                background-color: #333;
+                position: relative;
+                height: 30px;
+                width: 100%;
+            }
+            p.copyright {
+                position: absolute;
+                width: 100%;
+                color: #fff;
+                font-size: 0.75em;
+                text-align: center;
+                bottom:0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h3>KWSP Dividend Calculator</h3>
+            <div style="margin-bottom: 10px;">
+                <span style="margin-right: 15px;">
+                    <label>Year: </label>
+                    <input type="text" maxlength="4" id="year">
+                </span>
+
+                <span style="margin-left: 15px;">
+                    <label>Dividend: </label>
+                    <input type="text" id="dividend" value="0"><span>%</span>
+                </span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                    <b>Opening Balance</b>
+                </div>
+                <span style="margin-right: 15px;">
+                    <label>Account 1: </label>
+                    <input type="text" id="account1" class="text-end" value="0">
+                </span>
+
+                <span style="margin-left: 15px;">
+                    <label>Account 2: </label>
+                    <input type="text" id="account2" class="text-end" value="0">
+                </span>
+
+                <span style="margin-left: 15px;">
+                    <label>Total</label>
+                    <span id="opening"></span>
+                </span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <div style="margin-top: 10px; margin-bottom: 10px;">
+                    <b>Monthly Contributions</b>
+                </div>
+                <span style="margin-right: 15px;">
+                    <label>Employer: </label>
+                    <input type="text" id="employer" class="text-end" value="0">
+                </span>
+
+                <span style="margin-left: 15px;">
+                    <label>Employee: </label>
+                    <input type="text" id="employee" class="text-end" value="0">
+                </span>
+
+                <span style="margin-left: 15px;">
+                    <button type="button" id="set_contribution">Set</button>
+                </span>
+            </div>
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="6">Contributions</th>
+                            <th colspan="5">Account Details</th>
+                        </tr>
+                        <tr>
+                            <th style="width: 5%;">Month</th>
+                            <th style="width: 5%;">Days</th>
+                            <th style="width: 5%;">Acc. Days</th>
+                            <th style="width: 10%;">Employer</th>
+                            <th style="width: 10%;">Employee</th>
+                            <th style="width: 10%;">Total</th>
+
+                            <th style="width: 11%;">Account 1 (70%)</th>
+                            <th style="width: 11%;">Account 2 (30%)</th>
+                            <th style="width: 11%;">Account 1 Dividend</th>
+                            <th style="width: 11%;">Account 2 Dividend</th>
+                            <th style="width: 11%;">Total Dividend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthly"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3">&nbsp;</td>
+                            <td id="total_employer_contribution" class="text-end">0</td>
+                            <td id="total_employee_contribution" class="text-end">0</td>
+                            <td id="total_contribution" class="text-end">0</td>
+                            <td id="total_account1_contribution" class="text-end">0</td>
+                            <td id="total_account2_contribution" class="text-end">0</td>
+                            <td id="total_account1_dividend" class="text-end">0</td>
+                            <td id="total_account2_dividend" class="text-end">0</td>
+                            <td id="total_dividend" class="text-end">0</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text-end">
+                                <b>Balance as of 31<sup>st</sup> Dec <span class="year"><span></b>
+                            </td>
+                            <td id="account1_balance" class="text-end">0</td>
+                            <td id="account2_balance" class="text-end">0</td>
+                            <td id="total_balance" class="text-end">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <footer>
+                <p class="copyright">&copy; <span id="this_year"></span>. All rights reserved.</p>
+            </footer>
+        </div>
+        <script>
+            'use strict';
+            (function () {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                const dividend = document.getElementById('dividend');
+                const account1 = document.getElementById('account1');
+                const account2 = document.getElementById('account2');
+                const opening = document.getElementById('opening');
+
+                function init () {
+                    const now = new Date();
+                    const year = now.getFullYear() - 1;
+                    document.getElementById('year').value = year;
+                    document.getElementById('this_year').innerText = now.getFullYear();
+                    render(year);
+                    setYear(year);
+
+                    document.getElementById('year').addEventListener('blur', function (e) {
+                        render(this.value);
+                        setYear(this.value);
+                        computeMonthlyDividend();
+                    });
+
+                    document.getElementById('set_contribution').addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const employerValue = toFloat(document.getElementById('employer').value).toFixed(2);
+                        document.querySelectorAll('.employer').forEach(function (element) {
+                            element.value = employerValue;
+                        });
+
+                        const employeeValue = toFloat(document.getElementById('employee').value).toFixed(2);
+                        document.querySelectorAll('.employee').forEach(function (element) {
+                            element.value = employeeValue;
+                        });
+                        sumContribution();
+                        computeMonthlyDividend();
+                    });
+
+                    account1.addEventListener('blur', function (e) {
+                        sumOpening();
+                        computeMonthlyDividend();
+                    });
+                    account2.addEventListener('blur', function (e) {
+                        sumOpening();
+                        computeMonthlyDividend();
+                    });
+
+                    document.querySelectorAll('.employer').forEach(function (element) {
+                        element.addEventListener('blur', function (e) {
+                            sumContribution();
+                            computeMonthlyDividend();
+                        });
+                    });
+                    document.querySelectorAll('.employee').forEach(function (element) {
+                        element.addEventListener('blur', function (e) {
+                            sumContribution();
+                            computeMonthlyDividend();
+                        });
+                    });
+
+                    document.querySelectorAll('input').forEach(function (element) {
+                        element.addEventListener('focus', function (e) {
+                            if (this.value.trim().length > 0) {
+                                this.select();
+                            }
+                        });
+                    });
+                }
+                init();
+
+                function render (year) {
+                    let html = '', accDay = 0;
+                    for (let i = 0; i < months.length; i++) {
+                        const days = new Date(year, i + 1, 0).getDate();
+                        accDay += days;
+                        html += `<tr>
+                                    <td>${months[i]}</td>
+                                    <td class="days" data-month="${months[i]}">${days}</td>
+                                    <td class="acc-day" data-month="${months[i]}">${accDay}</td>
+                                    <td><input type="text" class="employer text-end" data-month="${months[i]}" value="0"></td>
+                                    <td><input type="text" class="employee text-end" data-month="${months[i]}" value="0"></td>
+                                    <td class="total-contribution text-end" data-month="${months[i]}">0</td>
+
+                                    <td class="account1-contribution text-end" data-month="${months[i]}">0</td>
+                                    <td class="account2-contribution text-end" data-month="${months[i]}">0</td>
+                                    <td class="account1-dividend text-end" data-month="${months[i]}">0</td>
+                                    <td class="account2-dividend text-end" data-month="${months[i]}">0</td>
+                                    <td class="total-dividend text-end" data-month="${months[i]}">0</td>
+                                </tr>
+                                `;
+                    }
+                    document.getElementById('monthly').innerHTML = html;
+                }
+
+                function setYear (year) {
+                    document.querySelectorAll('.year').forEach(function (element) {
+                        element.innerText = year;
+                    });
+                }
+
+                function toInt (value) {
+                    if (value) {
+                        const i = parseInt(value, 10);
+                        if (isNaN(i)) {
+                            return 0;
+                        }
+                        return i;
+                    }
+                    return 0;
+                }
+
+                function toFloat (value) {
+                    if (value) {
+                        const f = parseFloat(value);
+                        if (isNaN(f)) {
+                            return 0;
+                        }
+                        return f;
+                    }
+                    return 0;
+                }
+
+                function sumOpening () {
+                    const sum = toFloat(account1.value) + toFloat(account2.value);
+                    opening.innerText = sum.toFixed(2);
+                }
+
+                function sumContribution () {
+                    for (let i = 0; i < months.length; i++) {
+                        const employer = toFloat(document.querySelector(`.employer[data-month="${months[i]}"]`).value);
+                        const employee = toFloat(document.querySelector(`.employee[data-month="${months[i]}"]`).value);
+                        const total = (employer + employee);
+
+                        let acct1 = total * 0.7;
+                        acct1 = acct1.toFixed(2);
+                        document.querySelector(`.account1-contribution[data-month="${months[i]}"]`).innerText = acct1;
+
+                        let acct2 = total - toFloat(acct1);
+                        acct2 = acct2.toFixed(2);
+                        document.querySelector(`.account2-contribution[data-month="${months[i]}"]`).innerText = acct2;
+
+                        document.querySelector(`.total-contribution[data-month="${months[i]}"]`).innerText = total.toFixed(2);
+                    }
+                }
+
+                function computeMonthlyDividend () {
+                    const percentage = dividend.value * 0.01;
+                    const totalAccDay = toInt(document.querySelector('.acc-day[data-month="Dec"]').innerText);
+
+
+                    const total = {
+                        contribution: {
+                            employer: 0,
+                            employee: 0,
+                            total: 0,
+                            account1: 0,
+                            account2: 0
+                        },
+                        dividend: {
+                            account1: 0,
+                            account2: 0,
+                            total: 0
+                        }
+                    };
+                    let opening1 = toFloat(document.getElementById('account1').value);
+                    let opening2 = toFloat(document.getElementById('account2').value);
+                    for (let i = 0; i < months.length; i++) {
+                        const days = toFloat(document.querySelector(`.days[data-month="${months[i]}"]`).innerText);
+
+                        let contrib = toFloat(document.querySelector(`.account1-contribution[data-month="${months[i]}"]`).innerText);
+                        let account1Dividend = (contrib * percentage) / totalAccDay;
+                        if (i > 0) {
+                            opening1 += toFloat(document.querySelector(`.account1-contribution[data-month="${months[i-1]}"]`).innerText);
+                        }
+                        account1Dividend += (opening1 * percentage * days) / totalAccDay;
+                        account1Dividend = account1Dividend.toFixed(2);
+                        document.querySelector(`.account1-dividend[data-month="${months[i]}"]`).innerText = account1Dividend;
+
+                        contrib = toFloat(document.querySelector(`.account2-contribution[data-month="${months[i]}"]`).innerText);
+                        let account2Dividend = (contrib * percentage) / totalAccDay;
+                        if (i > 0) {
+                            opening2 += toFloat(document.querySelector(`.account2-contribution[data-month="${months[i-1]}"]`).innerText);
+                        }
+                        account2Dividend += (opening2 * percentage * days) / totalAccDay;
+                        account2Dividend = account2Dividend.toFixed(2);
+                        document.querySelector(`.account2-dividend[data-month="${months[i]}"]`).innerText = account2Dividend;
+
+                        const totalMonthlyDividend = toFloat(account1Dividend) + toFloat(account2Dividend);
+                        document.querySelector(`.total-dividend[data-month="${months[i]}"]`).innerText = totalMonthlyDividend.toFixed(2);
+
+                        total.contribution.employer += toFloat(document.querySelector(`.employer[data-month="${months[i]}"]`).value);
+                        total.contribution.employee += toFloat(document.querySelector(`.employee[data-month="${months[i]}"]`).value);
+                        total.contribution.total += toFloat(document.querySelector(`.total-contribution[data-month="${months[i]}"]`).innerText);
+                        total.contribution.account1 += toFloat(document.querySelector(`.account1-contribution[data-month="${months[i]}"]`).innerText);
+                        total.contribution.account2 += toFloat(document.querySelector(`.account2-contribution[data-month="${months[i]}"]`).innerText);
+                        total.dividend.account1 += toFloat(account1Dividend);
+                        total.dividend.account2 += toFloat(account2Dividend);
+                        total.dividend.total += totalMonthlyDividend;
+                    }
+                   setTotal(total);
+                }
+
+                function setTotal (total) {
+                    document.getElementById('total_employer_contribution').innerText = total.contribution.employer.toFixed(2);
+                    document.getElementById('total_employee_contribution').innerText = total.contribution.employee.toFixed(2);
+                    document.getElementById('total_contribution').innerText = total.contribution.total.toFixed(2);
+                    document.getElementById('total_account1_contribution').innerText = total.contribution.account1.toFixed(2);
+                    document.getElementById('total_account2_contribution').innerText = total.contribution.account2.toFixed(2);
+
+                    document.getElementById('total_account1_dividend').innerText = total.dividend.account1.toFixed(2);
+                    document.getElementById('total_account2_dividend').innerText = total.dividend.account2.toFixed(2);
+                    document.getElementById('total_dividend').innerText = total.dividend.total.toFixed(2);
+
+                    let account1Balance = toFloat(account1.value) + total.contribution.account1 + total.dividend.account1;
+                    account1Balance = account1Balance.toFixed(2);
+                    document.getElementById('account1_balance').innerHTML = `<b>${account1Balance}</b>`;
+
+                    let account2Balance = toFloat(account2.value) + total.contribution.account2 + total.dividend.account2;
+                    account2Balance = account2Balance.toFixed(2);
+                    document.getElementById('account2_balance').innerHTML = `<b>${account2Balance}</b>`;
+
+                    document.getElementById('total_balance').innerHTML = `<b>${(toFloat(account1Balance) + toFloat(account2Balance)).toFixed(2)}</b>`;
+                }
+            })();
+        </script>
+    </body>
+</html>
