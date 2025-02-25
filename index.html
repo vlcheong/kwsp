@@ -2,23 +2,25 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="description" content="KWSP (EPF) Dividend Calculator">
+        <meta name="description" content="EPF Dividend Calculator">
+        <meta name="keywords" content="Employee Provident Fund, EPF, EPF dividend, Kumpulan Wang Simpanan Pekerja, KWSP, Dividen KWSP">
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
         <meta property="og:locale" content="en_US">
-        <meta property="og:type" content="tool">
-        <meta property="og:title" content="KWSP (EPF) Dividend Calculator">
-        <meta property="og:description" content="KWSP (EPF) Dividend Calculator">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="EPF Dividend Calculator">
+        <meta property="og:description" content="Calculate your EPF dividend with EPF Dividend Calculator">
         <meta property="og:url" content="https://vlcheong.github.io/kwsp/">
         <meta property="og:site_name" content="vlcheong.github.io">
-        <meta property="article:modified_time" content="2022-03-13T15:03:08+00:00">
+        <meta property="article:modified_time" content="2025-02-15T15:03:08+00:00">
         <link href="styles.min.css" rel="stylesheet">
-        <title>KWSP (EPF) Dividend Calculator</title>
+        <link rel="canonical" href="https://vlcheong.github.io/kwsp/">
+        <title>Employee Provident Fund - EPF Dividend Calculator</title>
     </head>
     <body>
         <div class="container">
-            <h3>KWSP Dividend Calculator</h3>
+            <h1>EPF Dividend Calculator</h1>
             <div style="margin-bottom: 10px;">
                 <span style="margin-right: 15px;">
                     <label>Year: </label>
@@ -45,8 +47,13 @@
                 </span>
 
                 <span style="margin-left: 15px;">
+                    <label>Account 3: </label>
+                    <input type="text" id="account3" class="text-end" value="0">
+                </span>
+
+                <span style="margin-left: 15px;">
                     <label>Total</label>
-                    <span id="opening"></span>
+                    <span id="opening">0</span>
                 </span>
             </div>
             <div style="margin-bottom: 10px;">
@@ -72,21 +79,25 @@
                     <thead>
                         <tr>
                             <th colspan="6">Contributions</th>
-                            <th colspan="5">Account Details</th>
+                            <th colspan="7">Account Details</th>
                         </tr>
                         <tr>
                             <th style="width: 5%;">Month</th>
                             <th style="width: 5%;">Days</th>
                             <th style="width: 5%;">Acc. Days</th>
-                            <th style="width: 10%;">Employer</th>
-                            <th style="width: 10%;">Employee</th>
-                            <th style="width: 10%;">Total</th>
+                            <th style="width: 9%;">Employer</th>
+                            <th style="width: 9%;">Employee</th>
+                            <th style="width: 9%;">Total</th>
 
-                            <th style="width: 11%;">Account 1 (70%)</th>
-                            <th style="width: 11%;">Account 2 (30%)</th>
-                            <th style="width: 11%;">Account 1 Dividend</th>
-                            <th style="width: 11%;">Account 2 Dividend</th>
-                            <th style="width: 11%;">Total Dividend</th>
+                            <th style="width: 8%;">Account 1 (75%)</th>
+                            <th style="width: 8%;">Account 2 (15%)</th>
+                            <th style="width: 8%;">Account 3 (10%)</th>
+
+                            <th style="width: 8%;">Account 1 Dividend</th>
+                            <th style="width: 8%;">Account 2 Dividend</th>
+                            <th style="width: 8%;">Account 3 Dividend</th>
+
+                            <th style="width: 10%;">Total Dividend</th>
                         </tr>
                     </thead>
                     <tbody id="monthly"></tbody>
@@ -98,16 +109,19 @@
                             <td id="total_contribution" class="text-end">0</td>
                             <td id="total_account1_contribution" class="text-end">0</td>
                             <td id="total_account2_contribution" class="text-end">0</td>
+                            <td id="total_account3_contribution" class="text-end">0</td>
                             <td id="total_account1_dividend" class="text-end">0</td>
                             <td id="total_account2_dividend" class="text-end">0</td>
+                            <td id="total_account3_dividend" class="text-end">0</td>
                             <td id="total_dividend" class="text-end">0</td>
                         </tr>
                         <tr>
-                            <td colspan="8" class="text-end">
+                            <td colspan="9" class="text-end">
                                 <b>Balance as of 31<sup>st</sup> Dec <span class="year"><span></b>
                             </td>
                             <td id="account1_balance" class="text-end">0</td>
                             <td id="account2_balance" class="text-end">0</td>
+                            <td id="account3_balance" class="text-end">0</td>
                             <td id="total_balance" class="text-end">0</td>
                         </tr>
                     </tfoot>
@@ -116,7 +130,10 @@
             <footer>
                 <p class="copyright">
                     &copy; <span id="this_year"></span>. All rights reserved.
-                    &nbsp; Contact: <a href="mailto:cheongvl@yahoo.com" class="mail"></a>
+                    &nbsp; Contact: <a href="mailto:cheongvl@yahoo.com" class="mail"></a> or
+                    <a href="https://x.com/vlcheong" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 50" width="15px" height="15px"><path fill="#fff" d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z"/></svg>
+                    </a>
                 </p>
             </footer>
         </div>
